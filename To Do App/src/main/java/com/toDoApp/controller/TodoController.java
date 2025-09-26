@@ -5,6 +5,7 @@ import com.toDoApp.dto.request.UpdateTaskRequest;
 import com.toDoApp.dto.response.TodoResponse;
 import com.toDoApp.service.todo.TodoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/todos")
-@RequiredArgsConstructor
 public class TodoController {
-
-    private final TodoService todoService;
+    @Autowired
+    private  TodoService todoService;
 
     @PostMapping("/{userId}")
     public ResponseEntity<TodoResponse> createTodo(
