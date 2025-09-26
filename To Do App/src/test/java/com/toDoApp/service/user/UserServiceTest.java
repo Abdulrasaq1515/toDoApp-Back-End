@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class UserServiceTest {
+public class UserServiceTest {
 
     @Autowired
     private UserService userService;

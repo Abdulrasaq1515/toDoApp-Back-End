@@ -7,17 +7,18 @@ import com.toDoApp.dto.response.AuthResponse;
 import com.toDoApp.exception.*;
 import com.toDoApp.util.UserMapper;
 import com.toDoApp.util.UserValidator;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    @Autowired
+    private  UserRepository userRepository;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final Map<String, String> resetTokens = new HashMap<>();
 
     @Override

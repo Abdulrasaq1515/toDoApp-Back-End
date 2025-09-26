@@ -6,7 +6,7 @@ import com.toDoApp.dto.request.TodoRequest;
 import com.toDoApp.dto.response.TodoResponse;
 import com.toDoApp.exception.TodoNotFoundException;
 import com.toDoApp.util.TodoMapper;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class TodoServiceImpl implements TodoService {
 
-    private final TodoRepository todoRepository;
+    @Autowired
+    private  TodoRepository todoRepository;
 
     @Override
     public TodoResponse createTodo(String userId, TodoRequest request) {
