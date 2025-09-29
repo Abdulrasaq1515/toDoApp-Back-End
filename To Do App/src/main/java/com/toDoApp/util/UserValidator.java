@@ -6,6 +6,7 @@ import com.toDoApp.dto.request.RegisterRequest;
 import com.toDoApp.dto.request.LoginRequest;
 import com.toDoApp.exception.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class UserValidator {
@@ -39,7 +40,7 @@ public class UserValidator {
             throw new UserNotFoundException("Email not found");
         }
     }
-    public static void validateTokenExists(String token, java.util.Map<String, String> resetTokens) {
+    public static void validateTokenExists(String token, Map<String, String> resetTokens) {
         if (!resetTokens.containsKey(token)) {
             throw new TokenNotFoundException("Invalid or expired reset token");
         }
