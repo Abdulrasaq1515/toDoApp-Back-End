@@ -21,20 +21,27 @@ public class UserValidator {
             throw new UsernameAlreadyExistsException("Email already exists");
         }
     }
-
     public static User validateLogin(LoginRequest request, UserRepository userRepository) {
         Optional<User> optionUser = userRepository.findByUsername(request.getUsername());
         if (optionUser.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }
-        User user = optionUser.get();
-        return user;
+        return optionUser.get();
     }
-
     public static void validatePasswordMatch(String newPassword, String confirmNewPassword) {
         if (!newPassword.equals(confirmNewPassword)) {
             throw new PasswordMismatchException("Passwords do not match");
         }
     }
+    public static void validateUserExists(String email, UserRepository userRepository) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("Email not found");
+        }
+    }
+    public static void validateTokenExists(String token, java.util.Map<String, String> resetTokens) {
+        if (!resetTokens.containsKey(token)) {
+            throw new TokenNotFoundException("Invalid or expired reset token");
+        }
+    }
 }
-

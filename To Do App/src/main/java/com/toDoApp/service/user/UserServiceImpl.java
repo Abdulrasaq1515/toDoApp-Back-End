@@ -4,20 +4,24 @@ import com.toDoApp.data.model.User;
 import com.toDoApp.data.repository.UserRepository;
 import com.toDoApp.dto.request.*;
 import com.toDoApp.dto.response.AuthResponse;
-import com.toDoApp.exception.*;
+import com.toDoApp.exception.PasswordMismatchException;
+import com.toDoApp.exception.UserNotFoundException;
 import com.toDoApp.util.UserMapper;
 import com.toDoApp.util.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    private  PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     private final Map<String, String> resetTokens = new HashMap<>();
 
@@ -28,7 +32,6 @@ public class UserServiceImpl implements UserService {
         User saved = userRepository.save(user);
         return UserMapper.toAuthResponse(saved);
     }
-
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = UserValidator.validateLogin(request, userRepository);
@@ -37,25 +40,18 @@ public class UserServiceImpl implements UserService {
         }
         return UserMapper.toAuthResponse(user);
     }
-
     @Override
     public String forgotPassword(ForgotPasswordRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Email not found");
-        }
+        UserValidator.validateUserExists(request.getEmail(), userRepository);
         String token = UUID.randomUUID().toString();
         resetTokens.put(token, request.getEmail());
         return token;
     }
-
     @Override
     public String resetPassword(ResetPasswordRequest request) {
         UserValidator.validatePasswordMatch(request.getNewPassword().trim(), request.getConfirmNewPassword().trim());
+        UserValidator.validateTokenExists(request.getToken(), resetTokens);
         String email = resetTokens.get(request.getToken());
-        if (email == null) {
-            throw new TokenNotFoundException("Invalid or expired reset token");
-        }
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserMapper.updatePassword(user, passwordEncoder.encode(request.getNewPassword()));

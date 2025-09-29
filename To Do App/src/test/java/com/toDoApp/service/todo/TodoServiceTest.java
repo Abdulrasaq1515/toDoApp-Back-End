@@ -75,14 +75,10 @@ public class TodoServiceTest {
                 .completed(false)
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build();
-
         TodoResponse created = todoService.createTodo("1", request);
-
         TodoResponse updated = todoService.updateTodoStatus(created.getId(), true);
-
         assertTrue(updated.isCompleted());
     }
-
     @Test
     public void testSearchTodos() {
         todoService.createTodo("1", TodoRequest.builder()
@@ -90,18 +86,15 @@ public class TodoServiceTest {
                 .completed(false)
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build());
-
         todoService.createTodo("1", TodoRequest.builder()
                 .task("Write code")
                 .completed(false)
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build());
-
         List<TodoResponse> searchResults = todoService.searchTodos("1", "milk");
         assertEquals(1, searchResults.size());
         assertEquals("Buy milk", searchResults.get(0).getTask());
     }
-
     @Test
     public void testDeleteTodo() {
         TodoResponse created = todoService.createTodo("1", TodoRequest.builder()
@@ -109,10 +102,8 @@ public class TodoServiceTest {
                 .completed(false)
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build());
-
         boolean deleted = todoService.deleteTodo(created.getId());
         assertTrue(deleted);
-
         List<TodoResponse> todos = todoService.getTodosByUser("1");
         assertTrue(todos.isEmpty());
     }
