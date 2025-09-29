@@ -13,36 +13,37 @@ public class UserValidator {
 
     public static void validateRegister(RegisterRequest request, UserRepository userRepository) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new PasswordMismatchException("Passwords do not match");
+            throw new PasswordMismatchException("Password and confirmation password do not match");
         }
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UsernameAlreadyExistsException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username '" + request.getUsername() + "' is already taken");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UsernameAlreadyExistsException("Email already exists");
+            throw new UsernameAlreadyExistsException("Email '" + request.getEmail() + "' is already registered");
         }
     }
     public static User validateLogin(LoginRequest request, UserRepository userRepository) {
         Optional<User> optionUser = userRepository.findByUsername(request.getUsername());
         if (optionUser.isEmpty()) {
-            throw new UserNotFoundException("User not found");
+            throw new UserNotFoundException("Username '" + request.getUsername() + "' not found");
         }
         return optionUser.get();
     }
     public static void validatePasswordMatch(String newPassword, String confirmNewPassword) {
         if (!newPassword.equals(confirmNewPassword)) {
-            throw new PasswordMismatchException("Passwords do not match");
+            throw new PasswordMismatchException("New password and confirmation do not match");
         }
     }
     public static void validateUserExists(String email, UserRepository userRepository) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Email not found");
+            throw new UserNotFoundException("Email '" + email + "' not found in our system");
         }
     }
+
     public static void validateTokenExists(String token, Map<String, String> resetTokens) {
         if (!resetTokens.containsKey(token)) {
-            throw new TokenNotFoundException("Invalid or expired reset token");
+            throw new TokenNotFoundException("Password reset token is invalid or has expired");
         }
     }
 }

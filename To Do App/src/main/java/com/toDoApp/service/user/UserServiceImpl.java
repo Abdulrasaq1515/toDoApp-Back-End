@@ -32,31 +32,34 @@ public class UserServiceImpl implements UserService {
         User saved = userRepository.save(user);
         return UserMapper.toAuthResponse(saved);
     }
+
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = UserValidator.validateLogin(request, userRepository);
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new PasswordMismatchException("Invalid password");
+            throw new PasswordMismatchException("Incorrect password for username '" + request.getUsername() + "'");
         }
         return UserMapper.toAuthResponse(user);
     }
+
     @Override
     public String forgotPassword(ForgotPasswordRequest request) {
         UserValidator.validateUserExists(request.getEmail(), userRepository);
         String token = UUID.randomUUID().toString();
         resetTokens.put(token, request.getEmail());
-        return token;
+        return "Password reset token have been sent";
     }
+
     @Override
     public String resetPassword(ResetPasswordRequest request) {
         UserValidator.validatePasswordMatch(request.getNewPassword().trim(), request.getConfirmNewPassword().trim());
         UserValidator.validateTokenExists(request.getToken(), resetTokens);
         String email = resetTokens.get(request.getToken());
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User account not found"));
         UserMapper.updatePassword(user, passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         resetTokens.remove(request.getToken());
-        return "Password reset successful";
+        return "Password has been reset successfully";
     }
 }

@@ -51,11 +51,6 @@ public class AuthController {
             List<String> errors = new ArrayList<>();
             errors.add(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
-        } catch (Exception e) {
-            // Generic fallback
-            List<String> errors = new ArrayList<>();
-            errors.add("Login failed. Please try again.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
         }
     }
     @PostMapping("/forgot-password")
@@ -100,14 +95,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
         }
     }
-    // Handle validation exceptions
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = new ArrayList<>();
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         for (FieldError error : fieldErrors) {
-            String errorMessage = error.getDefaultMessage();
-            errors.add(errorMessage);
+            errors.add(error.getDefaultMessage());
         }
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
