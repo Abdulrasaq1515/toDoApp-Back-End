@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     private final Map<String, String> resetTokens = new HashMap<>();
 
     @Override
@@ -32,7 +31,6 @@ public class UserServiceImpl implements UserService {
         User saved = userRepository.save(user);
         return UserMapper.toAuthResponse(saved);
     }
-
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = UserValidator.validateLogin(request, userRepository);
@@ -41,7 +39,6 @@ public class UserServiceImpl implements UserService {
         }
         return UserMapper.toAuthResponse(user);
     }
-
     @Override
     public String forgotPassword(ForgotPasswordRequest request) {
         UserValidator.validateUserExists(request.getEmail(), userRepository);
@@ -49,7 +46,6 @@ public class UserServiceImpl implements UserService {
         resetTokens.put(token, request.getEmail());
         return "Password reset token have been sent";
     }
-
     @Override
     public String resetPassword(ResetPasswordRequest request) {
         UserValidator.validatePasswordMatch(request.getNewPassword().trim(), request.getConfirmNewPassword().trim());

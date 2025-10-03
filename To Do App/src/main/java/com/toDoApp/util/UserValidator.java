@@ -22,6 +22,7 @@ public class UserValidator {
             throw new UsernameAlreadyExistsException("Email '" + request.getEmail() + "' is already registered");
         }
     }
+
     public static User validateLogin(LoginRequest request, UserRepository userRepository) {
         Optional<User> optionUser = userRepository.findByUsername(request.getUsername());
         if (optionUser.isEmpty()) {
@@ -40,7 +41,6 @@ public class UserValidator {
             throw new UserNotFoundException("Email '" + email + "' not found in our system");
         }
     }
-
     public static void validateTokenExists(String token, Map<String, String> resetTokens) {
         if (!resetTokens.containsKey(token)) {
             throw new TokenNotFoundException("Password reset token is invalid or has expired");
