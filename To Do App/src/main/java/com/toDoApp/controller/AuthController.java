@@ -19,81 +19,31 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AuthController {
+
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            AuthResponse response = userService.register(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // Return the specific error message from the service
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = userService.register(request);
+        return ResponseEntity.ok(response);
     }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            AuthResponse response = userService.login(request);
-            return ResponseEntity.ok(response);
-        } catch (UserNotFoundException e) {
-            // Specific: Username not found
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-        } catch (PasswordMismatchException e) {
-            // Specific: Wrong password
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
-        }
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        try {
-            String response = userService.forgotPassword(request);
-            return ResponseEntity.ok(response);
-        } catch (UserNotFoundException e) {
-            // Specific: Email not found
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-        } catch (Exception e) {
-            List<String> errors = new ArrayList<>();
-            errors.add("Failed to process password reset request. Please try again.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
-        }
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        String response = userService.forgotPassword(request);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        try {
-            String response = userService.resetPassword(request);
-            return ResponseEntity.ok(response);
-        } catch (TokenNotFoundException e) {
-            // Specific: Invalid or expired token
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        } catch (UserNotFoundException e) {
-            // Specific: User not found
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-        } catch (PasswordMismatchException e) {
-            // Specific: Password validation failed
-            List<String> errors = new ArrayList<>();
-            errors.add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        } catch (Exception e) {
-            List<String> errors = new ArrayList<>();
-            errors.add("Failed to reset password. Please try again.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
-        }
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        String response = userService.resetPassword(request);
+        return ResponseEntity.ok(response);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -103,5 +53,17 @@ public class AuthController {
             errors.add(error.getDefaultMessage());
         }
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<List<String>> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(ex.getMessage()));
+    }
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<List<String>> handlePasswordMismatch(PasswordMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of(ex.getMessage()));
+    }
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<List<String>> handleTokenNotFound(TokenNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(List.of(ex.getMessage()));
     }
 }

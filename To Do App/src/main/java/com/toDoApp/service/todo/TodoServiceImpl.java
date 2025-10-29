@@ -25,7 +25,7 @@ public class TodoServiceImpl implements TodoService {
         Todo saved = todoRepository.save(todo);
         return TodoMapper.toResponse(saved);
     }
-
+    
     @Override
     public List<TodoResponse> getTodosByUser(String userId) {
         List<Todo> todos = todoRepository.findByUserId(userId);

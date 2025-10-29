@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class UserValidator {
-
     public static void validateRegister(RegisterRequest request, UserRepository userRepository) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new PasswordMismatchException("Password and confirmation password do not match");
@@ -22,7 +21,6 @@ public class UserValidator {
             throw new UsernameAlreadyExistsException("Email '" + request.getEmail() + "' is already registered");
         }
     }
-
     public static User validateLogin(LoginRequest request, UserRepository userRepository) {
         Optional<User> optionUser = userRepository.findByUsername(request.getUsername());
         if (optionUser.isEmpty()) {
